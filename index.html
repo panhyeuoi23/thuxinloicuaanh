@@ -376,7 +376,7 @@ Thương em.
   </audio>
 
   <script>
-    const env = document.getElementById('env');
+  const env = document.getElementById('env');
   const openBtn = document.getElementById('openBtn');
   const readBtn = document.getElementById('readBtn');
   const closeAnimBtn = document.getElementById('closeAnimBtn');
@@ -418,9 +418,9 @@ Thương em.
 
   // Mở phong thư trước, rồi hiện modal (mượt)
   function openThenRead(){
-    if(!isOpen) openEnvelope();
-    setTimeout(() => openLetterModal(), 450);
-  }
+  if(!isOpen) openEnvelope();   // mở phong thư
+  setTimeout(() => openLetterModal(), 500); // đợi animation rồi mở thư
+}
 
   async function toggleMusic(){
     try{
@@ -458,15 +458,18 @@ Thương em.
 
   // Nút "Đọc thư": mở phong thư trước rồi hiện thư
   readBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    openThenRead();
-  });
+  e.preventDefault();
+  e.stopPropagation();
+  openThenRead();
+});
 
   // Nút "Đóng phong thư"
   closeAnimBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    closeEnvelope();
-  });
+  e.preventDefault();
+  e.stopPropagation();
+  closeLetterModal();  // nếu đang mở thư thì đóng
+  closeEnvelope();     // đóng phong thư
+});
 
   // Đóng modal
   closeModal.addEventListener('click', (e) => {
