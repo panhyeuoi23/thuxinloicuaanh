@@ -213,7 +213,11 @@
       justify-content:center;
       flex-wrap:wrap;
     }
-
+/* FIX: buttons not clickable (bring CTA above overlays) */
+.scene { position: relative; }
+.cta { position: relative; z-index: 20; pointer-events: auto; }
+.cta .btn { pointer-events: auto; }
+.envelope, .glow { pointer-events: none; }
     /* Open state */
     .envelopeWrap.open .flap{ transform: rotateX(155deg); }
     .envelopeWrap.open .letterPaper{ transform: translateX(-50%) translateY(-66px); }
@@ -304,7 +308,7 @@
         <div class="scene" id="scene">
           <div class="glow"></div>
 
-          <div class="envelopeWrap" id="env">
+          <div class="envelopeWrap" id="env" style="pointer-events:auto; z-index:10;">
             <div class="envelope">
               <div class="flap"></div>
               <div class="bodyTri"></div>
