@@ -1,73 +1,463 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lá thư dành cho em</title>
-<style>
-body{
-  margin:0;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#f2f2f2;
-  font-family:Segoe UI,Arial,sans-serif
-}
-.card{
-  background:#fff;
-  padding:28px;
-  border-radius:20px;
-  box-shadow:0 15px 40px rgba(0,0,0,.1);
-  max-width:720px;
-  width:90%;
-  text-align:center
-}
-.envelope{font-size:56px;cursor:pointer}
-.letter{
-  display:none;
-  margin-top:20px;
-  text-align:left;
-  line-height:1.7
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lá thư xin lỗi</title>
+  <style>
+    :root{
+      --bg1:#0b1020; --bg2:#1b0b1b;
+      --card: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --accent: #ff4d7d;
+      --accent2:#ffd166;
+      --shadow: 0 24px 70px rgba(0,0,0,.45);
+      --radius: 22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(255,77,125,.20), transparent 55%),
+                  radial-gradient(900px 700px at 80% 30%, rgba(255,209,102,.18), transparent 55%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+    .stars{
+      position:fixed; inset:0; pointer-events:none; opacity:.55;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.55), transparent 60%),
+        radial-gradient(1px 1px at 160px 90px, rgba(255,255,255,.35), transparent 60%),
+        radial-gradient(2px 2px at 260px 220px, rgba(255,255,255,.45), transparent 60%),
+        radial-gradient(1px 1px at 420px 160px, rgba(255,255,255,.35), transparent 60%),
+        radial-gradient(2px 2px at 620px 320px, rgba(255,255,255,.45), transparent 60%);
+      background-size: 700px 420px;
+      animation: drift 18s linear infinite;
+    }
+    @keyframes drift{ from{transform:translateY(0)} to{transform:translateY(-60px)} }
+
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:26px 16px;
+    }
+    .card{
+      width:min(880px, 92vw);
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      padding: 22px;
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:18px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+    }
+    .dot{
+      width:12px; height:12px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
+      box-shadow: 0 0 18px rgba(255,77,125,.55);
+    }
+    .title{
+      font-weight:700; letter-spacing:.2px;
+    }
+    .sub{
+      color:var(--muted); font-size:13px; margin-top:2px;
+    }
+    .controls{
+      display:flex; gap:10px; align-items:center;
+    }
+    .btn{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:600;
+      transition: transform .08s ease, background .2s ease;
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.10); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      border-color: rgba(255,77,125,.45);
+      background: rgba(255,77,125,.18);
+    }
+
+    .main{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:18px;
+    }
+    @media (max-width: 860px){
+      .main{ grid-template-columns: 1fr; }
+    }
+
+    /* Envelope scene */
+    .scene{
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.14);
+      border-radius: var(--radius);
+      padding: 18px;
+      position:relative;
+      overflow:hidden;
+      min-height: 360px;
+      display:grid;
+      place-items:center;
+    }
+    .glow{
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,77,125,.20), transparent 55%),
+                  radial-gradient(circle at 70% 60%, rgba(255,209,102,.18), transparent 58%);
+      filter: blur(18px);
+      opacity:.9;
+      animation: pulse 4.8s ease-in-out infinite;
+    }
+    @keyframes pulse{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+
+    .envelopeWrap{
+      position:relative;
+      width: 280px; height: 190px;
+      transform: translateY(8px);
+    }
+    .envelope{
+      position:absolute; inset:0;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .envelope:before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(500px 220px at 50% 120%, rgba(255,255,255,.18), transparent 58%);
+      opacity:.8;
+    }
+    .flap{
+      position:absolute;
+      left:0; right:0; top:0;
+      height: 62%;
+      transform-origin: top center;
+      transform: rotateX(0deg);
+      transition: transform .8s cubic-bezier(.2,.9,.1,1);
+      background: linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.06));
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      border-bottom:1px solid rgba(255,255,255,.18);
+      filter: drop-shadow(0 12px 22px rgba(0,0,0,.25));
+    }
+    .bodyTri{
+      position:absolute; inset:0;
+      clip-path: polygon(0 100%, 50% 55%, 100% 100%, 100% 0, 0 0);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+    }
+    .seal{
+      position:absolute;
+      left:50%; top:58%;
+      width: 54px; height:54px;
+      transform: translate(-50%,-50%);
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
+      box-shadow: 0 0 20px rgba(255,77,125,.55);
+      display:grid; place-items:center;
+      font-weight:900;
+      color: rgba(20,10,16,.85);
+      letter-spacing:.5px;
+      user-select:none;
+      transition: transform .35s ease, opacity .35s ease;
+    }
+    .letterPaper{
+      position:absolute;
+      left: 50%;
+      bottom: 14px;
+      width: 240px;
+      height: 150px;
+      transform: translateX(-50%) translateY(46px);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.85));
+      box-shadow: 0 20px 40px rgba(0,0,0,.30);
+      border: 1px solid rgba(0,0,0,.06);
+      transition: transform .9s cubic-bezier(.2,.95,.1,1);
+      overflow:hidden;
+    }
+    .paperLines{
+      position:absolute; inset:14px 16px 16px;
+      background:
+        linear-gradient(to bottom, rgba(255,77,125,.10), rgba(255,77,125,.10)) 0 22px/100% 2px,
+        linear-gradient(to bottom, rgba(0,0,0,.06), rgba(0,0,0,.06)) 0 46px/100% 2px,
+        linear-gradient(to bottom, rgba(0,0,0,.06), rgba(0,0,0,.06)) 0 70px/100% 2px,
+        linear-gradient(to bottom, rgba(0,0,0,.06), rgba(0,0,0,.06)) 0 94px/100% 2px,
+        linear-gradient(to bottom, rgba(0,0,0,.06), rgba(0,0,0,.06)) 0 118px/100% 2px;
+      background-repeat:no-repeat;
+      opacity:.9;
+    }
+    .tapHint{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+    }
+    .cta{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    /* Open state */
+    .open .flap{ transform: rotateX(155deg); }
+    .open .letterPaper{ transform: translateX(-50%) translateY(-66px); }
+    .open .seal{ transform: translate(-50%,-50%) scale(.9); opacity:.35; }
+
+    /* Right side: letter modal */
+    .panel{
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.10);
+      border-radius: var(--radius);
+      padding: 18px;
+      min-height: 360px;
+      position:relative;
+      overflow:hidden;
+    }
+    .panel h3{ margin:0; font-size:18px; }
+    .panel p{ color:var(--muted); margin:10px 0 0; line-height:1.6; }
+
+    .modal{
+      position:fixed; inset:0;
+      display:none;
+      place-items:center;
+      padding: 18px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+      z-index: 50;
+    }
+    .modal.show{ display:grid; }
+    .sheet{
+      width:min(760px, 94vw);
+      background: rgba(255,255,255,.94);
+      color:#111;
+      border-radius: 22px;
+      box-shadow: 0 28px 80px rgba(0,0,0,.55);
+      padding: 22px 20px;
+      position:relative;
+      animation: pop .22s ease-out;
+    }
+    @keyframes pop{ from{transform:translateY(10px); opacity:.6} to{transform:translateY(0); opacity:1} }
+    .sheet h2{ margin:0 0 10px; font-size:20px; }
+    .sheet .text{ white-space:pre-wrap; line-height:1.75; font-size:16px; }
+    .sheet .sig{ margin-top:14px; opacity:.9; }
+    .x{
+      position:absolute; right:12px; top:12px;
+      border:0; cursor:pointer;
+      width:40px; height:40px; border-radius:14px;
+      background: rgba(0,0,0,.06);
+      font-weight:900;
+    }
+    .x:hover{ background: rgba(0,0,0,.10); }
+
+    /* small toast */
+    .toast{
+      position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);
+      color:rgba(255,255,255,.9);
+      padding:10px 12px;
+      border-radius: 14px;
+      display:none;
+      z-index:60;
+      font-size:13px;
+    }
+    .toast.show{ display:block; }
+  </style>
 </head>
 <body>
+  <div class="stars"></div>
 
-<div class="card">
-  <div class="envelope" onclick="openLetter()">💌</div>
-  <h2>Nhấn vào lá thư</h2>
+  <div class="wrap">
+    <div class="card">
+      <div class="topbar">
+        <div class="brand">
+          <div class="dot"></div>
+          <div>
+            <div class="title">Lá thư dành cho em</div>
+            <div class="sub">Bấm “Mở thư” hoặc chạm vào phong thư.</div>
+          </div>
+        </div>
 
-  <div class="letter" id="letter">
-    <p>Gửi em,</p>
-    <p>
-      Anh viết những dòng này không phải để biện minh,
-      mà để nói lời xin lỗi một cách chân thành nhất.
-      Anh đã sai khi không đủ tinh tế, không đủ lắng nghe,
-      và để em phải buồn.
-    </p>
-    <p>
-      Anh không mong mọi thứ quay lại ngay,
-      chỉ mong em biết rằng anh trân trọng em
-      và sẵn sàng thay đổi để yêu em đúng cách hơn.
-    </p>
-    <p>
-      Nếu em cho anh cơ hội,
-      anh sẽ chứng minh bằng hành động,
-      không phải lời hứa.
-    </p>
-    <p>
-      Thương em,<br>
-      <b>[Tên của bạn]</b>
-    </p>
+        <div class="controls">
+          <button class="btn" id="musicBtn">♫ Bật nhạc</button>
+          <button class="btn primary" id="openBtn">💌 Mở thư</button>
+        </div>
+      </div>
+
+      <div class="main">
+        <div class="scene" id="scene">
+          <div class="glow"></div>
+
+          <div class="envelopeWrap" id="env">
+            <div class="envelope">
+              <div class="flap"></div>
+              <div class="bodyTri"></div>
+              <div class="seal">S</div>
+              <div class="letterPaper">
+                <div class="paperLines"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tapHint">Chạm vào phong thư để mở hiệu ứng ✨</div>
+
+          <div class="cta">
+            <button class="btn primary" id="readBtn">📖 Đọc thư</button>
+            <button class="btn" id="closeAnimBtn">↩ Đóng phong thư</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Gợi ý</h3>
+          <p>
+            • Nhạc chỉ phát sau khi người dùng bấm (quy định trình duyệt).<br/>
+            • Nội dung thư nằm trong phần “NỘI DUNG THƯ” ở dưới (bạn sửa tùy ý).<br/>
+            • Nếu nhạc không phát: đảm bảo có file <b>music.mp3</b> ở root repo.
+          </p>
+
+          <p style="margin-top:14px;color:rgba(255,255,255,.78)">
+            Khi em sẵn sàng, bấm <b>Đọc thư</b>.
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<script>
-function openLetter(){
-  document.getElementById("letter").style.display="block";
-}
-</script>
+  <!-- Modal letter -->
+  <div class="modal" id="modal">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <button class="x" id="closeModal" aria-label="Đóng">✕</button>
+      <h2>Gửi em,</h2>
 
+      <!-- ====== NỘI DUNG THƯ: sửa tại đây ====== -->
+      <div class="text" id="letterText">
+Anh xin lỗi vì đã làm em buồn.
+
+Anh đã suy nghĩ rất nhiều và nhận ra anh cần thay đổi: biết lắng nghe hơn, bình tĩnh hơn, và trân trọng cảm xúc của em nhiều hơn.
+
+Anh không muốn biện minh. Anh chỉ muốn nhận lỗi và mong em cho anh cơ hội để sửa sai bằng hành động, không chỉ bằng lời nói.
+
+Nếu em đồng ý, anh muốn được nói chuyện với em tử tế, để anh hiểu em hơn và để em thấy anh thật sự nghiêm túc.
+
+Thương em.
+      </div>
+      <!-- ====================================== -->
+
+      <div class="sig">
+        <div>— <b>[Tên của bạn]</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <audio id="bgm" preload="auto" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const scene = document.getElementById('scene');
+    const env = document.getElementById('env');
+    const openBtn = document.getElementById('openBtn');
+    const readBtn = document.getElementById('readBtn');
+    const closeAnimBtn = document.getElementById('closeAnimBtn');
+
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('closeModal');
+
+    const bgm = document.getElementById('bgm');
+    const musicBtn = document.getElementById('musicBtn');
+
+    const toast = document.getElementById('toast');
+    let isOpen = false;
+    let musicOn = false;
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'), 2200);
+    }
+
+    function openEnvelope(){
+      env.classList.add('open');
+      isOpen = true;
+    }
+    function closeEnvelope(){
+      env.classList.remove('open');
+      isOpen = false;
+    }
+
+    function openLetterModal(){
+      modal.classList.add('show');
+    }
+    function closeLetterModal(){
+      modal.classList.remove('show');
+    }
+
+    async function toggleMusic(){
+      try{
+        if(!musicOn){
+          await bgm.play(); // must be user-gesture triggered
+          musicOn = true;
+          musicBtn.textContent = "❚❚ Tắt nhạc";
+          showToast("Nhạc đã bật ♫");
+        }else{
+          bgm.pause();
+          musicOn = false;
+          musicBtn.textContent = "♫ Bật nhạc";
+          showToast("Đã tắt nhạc");
+        }
+      }catch(e){
+        showToast("Không phát được nhạc: hãy kiểm tra file music.mp3");
+      }
+    }
+
+    // Events
+    env.addEventListener('click', () => {
+      if(!isOpen) openEnvelope();
+      else openLetterModal();
+    });
+
+    openBtn.addEventListener('click', () => {
+      openEnvelope();
+      // gợi ý bật nhạc
+      showToast("Bấm “Bật nhạc” để nghe nhé");
+    });
+
+    readBtn.addEventListener('click', () => {
+      if(!isOpen) openEnvelope();
+      openLetterModal();
+    });
+
+    closeAnimBtn.addEventListener('click', () => closeEnvelope());
+
+    closeModal.addEventListener('click', closeLetterModal);
+    modal.addEventListener('click', (e) => {
+      if(e.target === modal) closeLetterModal();
+    });
+
+    musicBtn.addEventListener('click', toggleMusic);
+
+    // ESC to close modal
+    document.addEventListener('keydown', (e) => {
+      if(e.key === "Escape") closeLetterModal();
+    });
+  </script>
 </body>
 </html>
