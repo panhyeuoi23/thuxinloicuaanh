@@ -372,92 +372,119 @@ Thương em.
   </audio>
 
   <script>
-    const scene = document.getElementById('scene');
     const env = document.getElementById('env');
-    const openBtn = document.getElementById('openBtn');
-    const readBtn = document.getElementById('readBtn');
-    const closeAnimBtn = document.getElementById('closeAnimBtn');
+  const openBtn = document.getElementById('openBtn');
+  const readBtn = document.getElementById('readBtn');
+  const closeAnimBtn = document.getElementById('closeAnimBtn');
 
-    const modal = document.getElementById('modal');
-    const closeModal = document.getElementById('closeModal');
+  const modal = document.getElementById('modal');
+  const closeModal = document.getElementById('closeModal');
 
-    const bgm = document.getElementById('bgm');
-    const musicBtn = document.getElementById('musicBtn');
+  const bgm = document.getElementById('bgm');
+  const musicBtn = document.getElementById('musicBtn');
 
-    const toast = document.getElementById('toast');
-    let isOpen = false;
-    let musicOn = false;
+  const toast = document.getElementById('toast');
 
-    function showToast(msg){
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(()=>toast.classList.remove('show'), 2200);
-    }
+  let isOpen = false;
+  let musicOn = false;
 
-    function openEnvelope(){
-      env.classList.add('open');
-      isOpen = true;
-    }
-    function closeEnvelope(){
-      env.classList.remove('open');
-      isOpen = false;
-    }
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 2200);
+  }
 
-    function openLetterModal(){
-      modal.classList.add('show');
-    }
-    function closeLetterModal(){
-      modal.classList.remove('show');
-    }
+  function openEnvelope(){
+    env.classList.add('open');   // CSS FIX uses .envelopeWrap.open ...
+    isOpen = true;
+  }
 
-    async function toggleMusic(){
-      try{
-        if(!musicOn){
-          await bgm.play(); // must be user-gesture triggered
-          musicOn = true;
-          musicBtn.textContent = "❚❚ Tắt nhạc";
-          showToast("Nhạc đã bật ♫");
-        }else{
-          bgm.pause();
-          musicOn = false;
-          musicBtn.textContent = "♫ Bật nhạc";
-          showToast("Đã tắt nhạc");
-        }
-      }catch(e){
-        showToast("Không phát được nhạc: hãy kiểm tra file music.mp3");
+  function closeEnvelope(){
+    env.classList.remove('open');
+    isOpen = false;
+  }
+
+  function openLetterModal(){
+    modal.classList.add('show');
+  }
+
+  function closeLetterModal(){
+    modal.classList.remove('show');
+  }
+
+  // Mở phong thư trước, rồi hiện modal (mượt)
+  function openThenRead(){
+    if(!isOpen) openEnvelope();
+    setTimeout(() => openLetterModal(), 450);
+  }
+
+  async function toggleMusic(){
+    try{
+      if(!musicOn){
+        await bgm.play(); // must be user-gesture triggered
+        musicOn = true;
+        musicBtn.textContent = "❚❚ Tắt nhạc";
+        showToast("Nhạc đã bật ♫");
+      }else{
+        bgm.pause();
+        musicOn = false;
+        musicBtn.textContent = "♫ Bật nhạc";
+        showToast("Đã tắt nhạc");
       }
+    }catch(e){
+      showToast("Không phát được nhạc: kiểm tra music.mp3 ở root repo");
     }
+  }
 
-    // Events
-    env.addEventListener('click', () => {
-      if(!isOpen) openEnvelope();
-      else openLetterModal();
-    });
+  // ===== EVENTS =====
+  // Chạm phong thư: nếu chưa mở -> mở; nếu đã mở -> đọc thư
+  env.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if(!isOpen) openEnvelope();
+    else openLetterModal();
+  });
 
-    openBtn.addEventListener('click', () => {
-      openEnvelope();
-      // gợi ý bật nhạc
-      showToast("Bấm “Bật nhạc” để nghe nhé");
-    });
+  // Nút trên cùng "Mở thư": mở phong thư
+  openBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    openEnvelope();
+    showToast("Bấm “Đọc thư” để xem nội dung");
+  });
 
-    readBtn.addEventListener('click', () => {
-      if(!isOpen) openEnvelope();
-      openLetterModal();
-    });
+  // Nút "Đọc thư": mở phong thư trước rồi hiện thư
+  readBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    openThenRead();
+  });
 
-    closeAnimBtn.addEventListener('click', () => closeEnvelope());
+  // Nút "Đóng phong thư"
+  closeAnimBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeEnvelope();
+  });
 
-    closeModal.addEventListener('click', closeLetterModal);
-    modal.addEventListener('click', (e) => {
-      if(e.target === modal) closeLetterModal();
-    });
+  // Đóng modal
+  closeModal.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeLetterModal();
+  });
 
-    musicBtn.addEventListener('click', toggleMusic);
+  // Click nền tối để đóng
+  modal.addEventListener('click', (e) => {
+    if(e.target === modal) closeLetterModal();
+  });
 
-    // ESC to close modal
-    document.addEventListener('keydown', (e) => {
-      if(e.key === "Escape") closeLetterModal();
-    });
+  // ESC đóng thư
+  document.addEventListener('keydown', (e) => {
+    if(e.key === "Escape") closeLetterModal();
+  });
+
+  // Nhạc
+  musicBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    toggleMusic();
+  });
   </script>
 </body>
 </html>
