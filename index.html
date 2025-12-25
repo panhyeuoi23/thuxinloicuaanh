@@ -282,6 +282,25 @@
       font-size:13px;
     }
     .toast.show{ display:block; }
+
+    /* FIX mobile: allow scrolling inside the letter modal */
+.modal{
+  overflow-y: auto;              /* cho phép cuộn */
+  -webkit-overflow-scrolling: touch;
+  align-items: flex-start;        /* để sheet nằm trên, dễ cuộn */
+  padding: 18px;
+}
+
+.sheet{
+  margin: 18px auto;
+  max-height: calc(100vh - 36px); /* không vượt màn hình */
+  overflow: auto;                 /* cuộn trong sheet */
+}
+
+/* nếu nội dung dài */
+.sheet .text{
+  overflow-wrap: anywhere;
+}
   </style>
 </head>
 <body>
